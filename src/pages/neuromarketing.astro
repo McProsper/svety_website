@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import { site } from "../data/site";
+import { getMediumArticles } from "../utils/medium";
+
+const articles = await getMediumArticles(site.mediumUsername);
+---
+
+<Layout
+  title="Le Lab"
+  description="Articles de neuromarketing et de sociologie : sciences cognitives, perception de marque et regard sociologique."
+>
+  <section class="mx-auto max-w-6xl px-4 pb-8 pt-20 md:pt-28">
+    <p class="text-sm font-medium tracking-[0.18em] text-muted uppercase">Recherche</p>
+    <h1 class="mt-4 max-w-4xl text-4xl font-semibold tracking-tight md:text-6xl">
+      Le Lab : Sciences Cognitives & Regard Sociologique
+    </h1>
+    <p class="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
+      J'allie marketing et sociologie pour lire ce qui se joue sous les messages : normes, émotions, attention, appartenances.
+      Le neuromarketing n'est pas une ruse — c'est une méthode pour mieux comprendre l'humain, puis mieux communiquer.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 py-10">
+    <div class="grid gap-6 md:grid-cols-2">
+      {articles.map((article) => <ArticleCard article={article} />)}
+    </div>
+    {
+      !site.mediumUsername && (
+        <p class="mt-8 text-sm text-muted">
+          Les cartes affichées sont des exemples. Renseignez <code>MEDIUM_USERNAME</code> dans <code>.env</code> pour charger votre flux RSS Medium.
+        </p>
+      )
+    }
+  </section>
+</Layout>

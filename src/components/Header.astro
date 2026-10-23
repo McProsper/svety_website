@@ -1,0 +1,84 @@
+---
+import { Menu, X } from "lucide-astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { nav, site } from "../data/site";
+
+const path = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-50">
+  <div class="mx-auto max-w-6xl px-4 pt-3">
+    <div class="glass flex items-center justify-between rounded-2xl px-4 py-2.5">
+      <a href="/" class="font-sans text-[15px] font-semibold tracking-tight text-ink dark:text-white">
+        {site.name}
+      </a>
+
+      <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
+        {
+          nav.map((item) => {
+            const active = item.href === "/" ? path === "/" : path.startsWith(item.href);
+            return (
+              <a
+                href={item.href}
+                class:list={[
+                  "rounded-full px-3.5 py-1.5 text-sm transition duration-300",
+                  active
+                    ? "bg-ink text-white dark:bg-white dark:text-ink"
+                    : "text-muted hover:text-ink dark:hover:text-white",
+                ]}
+              >
+                {item.label}
+              </a>
+            );
+          })
+        }
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <ThemeToggle />
+        <button
+          class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/5 dark:border-white/10 md:hidden"
+          type="button"
+          data-menu-toggle
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          aria-label="Ouvrir le menu"
+        >
+          <span data-icon-open><Menu size={18} stroke-width={1.6} /></span>
+          <span class="hidden" data-icon-close><X size={18} stroke-width={1.6} /></span>
+        </button>
+      </div>
+    </div>
+
+    <nav
+      id="mobile-nav"
+      class="glass mt-2 hidden rounded-2xl p-2 md:hidden"
+      aria-label="Mobile"
+    >
+      {
+        nav.map((item) => (
+          <a
+            href={item.href}
+            class="block rounded-xl px-3 py-2.5 text-sm text-ink dark:text-white hover:bg-black/5 dark:hover:bg-white/5"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector("[data-menu-toggle]");
+  const menu = document.getElementById("mobile-nav");
+  const openIcon = document.querySelector("[data-icon-open]");
+  const closeIcon = document.querySelector("[data-icon-close]");
+
+  toggle?.addEventListener("click", () => {
+    const open = menu?.classList.toggle("hidden") === false;
+    toggle.setAttribute("aria-expanded", String(open));
+    openIcon?.classList.toggle("hidden", open);
+    closeIcon?.classList.toggle("hidden", !open);
+  });
+</script>

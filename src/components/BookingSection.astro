@@ -1,0 +1,127 @@
+---
+import { Calendar, Clock, Download, Video } from "lucide-astro";
+import { site } from "../data/site";
+
+const { availability, calEmbedUrl, calUrl } = site;
+const embed = calEmbedUrl || calUrl;
+---
+
+<section id="rendez-vous" class="scroll-mt-28">
+  <div class="mb-8 max-w-2xl">
+    <p class="text-sm font-medium tracking-wide text-muted">Prise de rendez-vous</p>
+    <h2 class="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">Un échange, simplement.</h2>
+    <p class="mt-3 text-muted">
+      Pas de formulaire. Choisissez un créneau dans le calendrier, ou ajoutez un rendez-vous à votre agenda.
+    </p>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+    <div class="apple-card overflow-hidden">
+      {
+        embed ? (
+          <iframe
+            title="Calendrier de prise de rendez-vous"
+            src={embed}
+            class="min-h-[640px] w-full"
+          />
+        ) : (
+          <div class="flex min-h-[320px] flex-col items-center justify-center gap-4 p-10 text-center">
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-canvas dark:bg-black">
+              <Calendar size={26} stroke-width={1.4} />
+            </div>
+            <p class="max-w-sm text-sm text-muted">
+              Branchez votre lien Cal.com ou Calendly via <code class="text-ink dark:text-white">PUBLIC_CAL_EMBED_URL</code> pour afficher le widget ici.
+            </p>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="space-y-4">
+      <article class="apple-card p-6">
+        <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-canvas dark:bg-black">
+          <Calendar size={20} stroke-width={1.5} />
+        </div>
+        <h3 class="text-lg font-semibold tracking-tight">Créneaux indicatifs</h3>
+        <ul class="mt-4 space-y-3 text-sm">
+          <li class="flex items-center justify-between border-b border-black/5 pb-3 dark:border-white/10">
+            <span class="text-muted">Jours</span>
+            <span>{availability.days}</span>
+          </li>
+          <li class="flex items-center justify-between border-b border-black/5 pb-3 dark:border-white/10">
+            <span class="text-muted">Horaires</span>
+            <span class="inline-flex items-center gap-1.5">
+              <Clock size={14} stroke-width={1.6} />
+              {availability.hours}
+            </span>
+          </li>
+          <li class="flex items-center justify-between border-b border-black/5 pb-3 dark:border-white/10">
+            <span class="text-muted">Format</span>
+            <span class="inline-flex items-center gap-1.5">
+              <Video size={14} stroke-width={1.6} />
+              {availability.format}
+            </span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="text-muted">Durée</span>
+            <span>{availability.duration}</span>
+          </li>
+        </ul>
+      </article>
+
+      <button type="button" class="btn-primary w-full" data-ics>
+        <Download size={16} stroke-width={1.6} />
+        Ajouter un rendez-vous à votre calendrier (.ics)
+      </button>
+      <p class="text-center text-xs text-muted">Fichier iCal compatible Apple Calendar, Google et Outlook.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  function pad(value: number) {
+    return String(value).padStart(2, "0");
+  }
+
+  function stamp(date: Date) {
+    return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}00Z`;
+  }
+
+  function nextSlot() {
+    const date = new Date();
+    const day = date.getDay();
+    const add = day <= 2 ? 2 - day : day === 3 ? 0 : 9 - day;
+    date.setDate(date.getDate() + add);
+    date.setHours(14, 0, 0, 0);
+    const end = new Date(date);
+    end.setMinutes(30);
+    return { start: date, end };
+  }
+
+  document.querySelector("[data-ics]")?.addEventListener("click", () => {
+    const { start, end } = nextSlot();
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Svetlana//RDV//FR",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      `DTSTAMP:${stamp(new Date())}`,
+      `DTSTART:${stamp(start)}`,
+      `DTEND:${stamp(end)}`,
+      "SUMMARY:Échange avec Svetlana",
+      "DESCRIPTION:Rendez-vous visio ou téléphonique — 30 minutes.",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "rendez-vous-svetlana.ics";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+</script>

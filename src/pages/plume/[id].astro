@@ -1,0 +1,53 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { formatDate } from "../../utils/dates";
+
+export async function getStaticPaths() {
+  const poemes = await getCollection("poemes");
+  return poemes.map((poeme) => ({
+    params: { id: poeme.id },
+    props: { poeme },
+  }));
+}
+
+const { poeme } = Astro.props;
+const { Content } = await render(poeme);
+---
+
+<Layout title={poeme.data.title} description={poeme.data.excerpt} literary>
+  <article class="mx-auto max-w-3xl px-4 pb-24 pt-16 md:pt-24">
+    <p class="text-center font-sans text-xs tracking-[0.22em] text-muted uppercase">
+      {poeme.data.theme}
+    </p>
+    <h1 class="mt-4 text-center font-serif text-4xl font-light tracking-tight md:text-6xl">
+      {poeme.data.title}
+    </h1>
+    <time
+      class="mt-4 block text-center font-sans text-sm text-muted"
+      datetime={poeme.data.date.toISOString()}
+    >
+      {formatDate(poeme.data.date)}
+    </time>
+
+    <figure class="mt-12 overflow-hidden rounded-2xl border border-black/5 dark:border-white/10">
+      <img
+        src={poeme.data.illustration}
+        alt={poeme.data.altIllustration}
+        class="aspect-[16/10] w-full object-cover"
+      />
+    </figure>
+
+    <div
+      class="prose prose-lg prose-neutral mx-auto mt-14 max-w-xl text-center font-serif dark:prose-invert prose-headings:font-serif prose-headings:font-light prose-p:leading-[1.9] prose-p:text-ink/90 dark:prose-p:text-white/85"
+    >
+      <Content />
+    </div>
+
+    <p class="mt-16 text-center">
+      <a href="/plume" class="font-sans text-sm text-muted hover:text-ink dark:hover:text-white">
+        ← Retour à l'atelier
+      </a>
+    </p>
+  </article>
+</Layout>

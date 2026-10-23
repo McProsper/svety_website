@@ -1,0 +1,51 @@
+---
+import { ArrowUpRight, Award } from "lucide-astro";
+import type { Certification } from "../data/certifications";
+
+type Props = Certification;
+const { title, issuer, date, skills, verifyUrl, badge } = Astro.props;
+---
+
+<article class="apple-card apple-hover p-6">
+  <div class="mb-5 flex items-start justify-between gap-4">
+    <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-canvas dark:border-white/10 dark:bg-black">
+      {
+        badge ? (
+          <img src={badge} alt="" class="h-8 w-8 object-contain" />
+        ) : (
+          <Award size={20} stroke-width={1.5} class="text-muted" />
+        )
+      }
+    </div>
+    <p class="text-xs tracking-wide text-muted">{date}</p>
+  </div>
+
+  <h3 class="text-lg font-semibold tracking-tight">{title}</h3>
+  <p class="mt-1 text-sm text-muted">{issuer}</p>
+
+  <ul class="mt-4 flex flex-wrap gap-2">
+    {
+      skills.map((skill) => (
+        <li class="rounded-full border border-black/5 px-2.5 py-1 text-xs text-muted dark:border-white/10">
+          {skill}
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    verifyUrl ? (
+      <a
+        href={verifyUrl}
+        class="mt-5 inline-flex items-center gap-1 text-sm text-ink dark:text-white"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Vérifier
+        <ArrowUpRight size={14} stroke-width={1.6} />
+      </a>
+    ) : (
+      <p class="mt-5 text-xs text-muted">Lien de vérification à ajouter</p>
+    )
+  }
+</article>

@@ -1,0 +1,39 @@
+---
+import { ArrowUpRight } from "lucide-astro";
+import type { MediumArticle } from "../utils/medium";
+import { formatDate } from "../utils/dates";
+
+type Props = { article: MediumArticle };
+const { article } = Astro.props;
+const category = article.categories[0] ?? "Neuromarketing";
+---
+
+<article class="apple-card apple-hover overflow-hidden">
+  {
+    article.image && (
+      <img
+        src={article.image}
+        alt=""
+        class="aspect-[16/10] w-full object-cover"
+        loading="lazy"
+      />
+    )
+  }
+  <div class="p-6">
+    <div class="mb-3 flex items-center justify-between gap-3 text-xs text-muted">
+      <span class="rounded-full border border-black/5 px-2.5 py-1 dark:border-white/10">{category}</span>
+      <time datetime={article.pubDate.toISOString()}>{formatDate(article.pubDate)}</time>
+    </div>
+    <h3 class="text-lg font-semibold tracking-tight">{article.title}</h3>
+    <p class="mt-2 text-sm leading-relaxed text-muted">{article.excerpt}</p>
+    <a
+      href={article.link}
+      target="_blank"
+      rel="noreferrer"
+      class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium"
+    >
+      Lire sur Medium
+      <ArrowUpRight size={15} stroke-width={1.6} />
+    </a>
+  </div>
+</article>

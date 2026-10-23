@@ -1,0 +1,113 @@
+---
+import { ArrowRight, Brain, Briefcase, Feather } from "lucide-astro";
+import Layout from "../layouts/Layout.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import PoemeCard from "../components/PoemeCard.astro";
+import { site } from "../data/site";
+import { getMediumArticles } from "../utils/medium";
+import { getCollection } from "astro:content";
+
+const articles = (await getMediumArticles(site.mediumUsername)).slice(0, 2);
+const poemes = (await getCollection("poemes"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
+
+const pillars = [
+  {
+    href: "/neuromarketing",
+    icon: Brain,
+    title: "Neuromarketing & Sociologie",
+    text: "Une lecture scientifique de l'attention, des normes et des émotions — pour comprendre ce qui fait réellement agir.",
+  },
+  {
+    href: "/services",
+    icon: Briefcase,
+    title: "Services & Conseil",
+    text: "Stratégie de communication, ingénierie d'affaires et storytelling : des dispositifs clairs, humains, mesurables.",
+  },
+  {
+    href: "/plume",
+    icon: Feather,
+    title: "Plume & Poésie",
+    text: "Un atelier intime : poèmes illustrés, extraits et œuvres où la langue retrouve sa densité.",
+  },
+];
+---
+
+<Layout>
+  <section class="mx-auto max-w-6xl px-4 pb-8 pt-20 md:pt-28">
+    <p class="text-sm font-medium tracking-[0.18em] text-muted uppercase">Portfolio · Lab · Atelier</p>
+    <h1 class="mt-5 max-w-4xl text-4xl font-semibold leading-[1.08] tracking-tight md:text-6xl">
+      {site.tagline}
+    </h1>
+    <p class="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
+      {site.description}
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="/neuromarketing" class="btn-primary">Explorer mes recherches</a>
+      <a href="/services#rendez-vous" class="btn-secondary">Réserver un rendez-vous</a>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 py-16">
+    <h2 class="text-3xl font-semibold tracking-tight">Les 3 piliers de mon univers</h2>
+    <div class="mt-8 grid gap-5 md:grid-cols-3">
+      {
+        pillars.map((pillar) => (
+          <a href={pillar.href} class="apple-card apple-hover group p-7">
+            <div class="mb-8 flex h-11 w-11 items-center justify-center rounded-2xl bg-canvas dark:bg-black">
+              <pillar.icon size={20} stroke-width={1.5} />
+            </div>
+            <h3 class="text-xl font-semibold tracking-tight">{pillar.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-muted">{pillar.text}</p>
+            <span class="mt-6 inline-flex items-center gap-1 text-sm text-ink dark:text-white">
+              Découvrir
+              <ArrowRight size={14} class="transition group-hover:translate-x-0.5" stroke-width={1.6} />
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 py-10">
+    <div class="mb-8 flex items-end justify-between gap-4">
+      <div>
+        <p class="text-sm text-muted">À la une</p>
+        <h2 class="mt-1 text-3xl font-semibold tracking-tight">Dernières publications</h2>
+      </div>
+    </div>
+
+    <div class="grid gap-10 lg:grid-cols-2">
+      <div>
+        <div class="mb-4 flex items-center justify-between">
+          <h3 class="text-sm font-medium tracking-wide text-muted">Neuromarketing</h3>
+          <a href="/neuromarketing" class="text-sm">Tout voir</a>
+        </div>
+        <div class="grid gap-5">
+          {articles.map((article) => <ArticleCard article={article} />)}
+        </div>
+      </div>
+      <div>
+        <div class="mb-4 flex items-center justify-between">
+          <h3 class="text-sm font-medium tracking-wide text-muted">Poésie</h3>
+          <a href="/plume" class="text-sm">Tout voir</a>
+        </div>
+        <div class="grid gap-5">
+          {poemes.map((poeme) => <PoemeCard poeme={poeme} />)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 py-16">
+    <div class="apple-card overflow-hidden px-8 py-14 text-center md:px-16">
+      <p class="text-sm tracking-[0.18em] text-muted uppercase">Calendrier</p>
+      <h2 class="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Parlons de votre projet.</h2>
+      <p class="mx-auto mt-3 max-w-xl text-muted">
+        Un échange de 30 minutes, visio ou téléphone, pour clarifier un besoin, un positionnement ou une recherche.
+      </p>
+      <a href="/services#rendez-vous" class="btn-primary mt-8">Ouvrir le calendrier</a>
+    </div>
+  </section>
+</Layout>
